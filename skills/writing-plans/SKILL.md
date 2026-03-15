@@ -103,6 +103,54 @@ git commit -m "feat: add specific feature"
 ```
 ````
 
+## Testing Requirements
+
+Plans that include test tasks MUST follow spec-driven testing. Workers who receive vague testing instructions ("write tests") produce tests that verify nothing.
+
+### Before Writing Test Code: Extract Requirements
+
+Every plan chunk that includes tests MUST have a requirements extraction step before any test code is written. The implementer reads the spec and produces a structured mapping of requirements to test cases.
+
+For each requirement, define:
+- **What the spec requires** (concrete, verifiable statement)
+- **Observable assertion** (what state to check — file exists, response contains field, record in database)
+- **Setup** (what preconditions must exist — seed data, running services, funded wallets)
+
+If a requirement can't be stated as an observable assertion, it's not testable — flag it and move on.
+
+### Observable Assertions
+
+Tests verify **what happened**, not **how it happened**. Every test assertion must check observable state.
+
+Valid assertions:
+| Category | Example |
+|----------|---------|
+| Response content | `assert "signals" in data and len(data["signals"]) > 0` |
+| Data shape | `assert "asset" in signal and "action" in signal` |
+| State change | Record exists in database after operation |
+| Error specificity | `assert resp.status_code == 422` (one code, not a set) |
+
+**Invalid — these are fallback chains disguised as assertions:**
+| Anti-pattern | Why it's wrong |
+|-------------|---------------|
+| `assert status in (200, 502)` | Tolerates failure — test passes without exercising behavior |
+| `assert status in (200, 429)` | Masks resource exhaustion — test never verifies data shape |
+| `pytest.skip("no data")` without a seed fixture | Missing test prerequisite, not a valid skip condition |
+
+A test that tolerates an error code **is not testing the behavior it claims to test**. If the service might return 502, the plan must include a step that ensures the service is healthy before running tests — not an assertion that accepts 502.
+
+### Fixture and Seed Data
+
+If tests require external state (database records, funded wallets, running services), the plan MUST include explicit setup steps that create that state. Tests must not skip or degrade when state is missing — they must fail, because missing state means the test environment is broken.
+
+**Example:** If wizard tests need WizardProfile records, the plan includes a step that writes seed records to the registry before the test task runs.
+
+### Test Isolation
+
+- Fixtures that create test state must be **function-scoped** (no `scope="session"` or `scope="module"`) unless the state is truly immutable (e.g., a URL string from an env var)
+- Tests must not depend on execution order
+- Tests must create the state they need and verify the state they produce
+
 ## Remember
 - Exact file paths always
 - Complete code in plan (not "add validation")

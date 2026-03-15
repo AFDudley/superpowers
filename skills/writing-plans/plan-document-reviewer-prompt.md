@@ -36,6 +36,13 @@ Task tool (general-purpose):
     - Missing verification steps or expected outputs
     - Files planned to hold multiple responsibilities or likely to grow unwieldy
 
+    **Testing quality (if chunk includes test tasks):**
+    - Tests that tolerate multiple status codes (`assert status in (200, 502)`) — this is a fallback chain, not a test
+    - Tests that conditionally verify (`if status == 200: assert ...`) — skips verification on failure
+    - Tests that skip when data is missing without a fixture that creates the data — missing prerequisite, not a valid skip
+    - Test tasks that jump to writing code without extracting requirements from the spec first
+    - Missing seed data or fixture setup for tests that depend on external state
+
     ## Output Format
 
     ## Plan Review - Chunk N

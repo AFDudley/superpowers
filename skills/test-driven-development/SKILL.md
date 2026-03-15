@@ -354,6 +354,71 @@ Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix 
 
 Never fix bugs without a test.
 
+## Assertion Quality
+
+TDD tells you to write the test first. This section tells you how to write assertions that actually verify behavior.
+
+### Observable State, Not Status Code Tolerance
+
+Tests verify **what happened** — observable state changes, response content, data shape. Not **that something didn't crash**.
+
+```python
+# WRONG — fallback chain. Passes when service is down (502),
+# quota exhausted (429), or actually working (200).
+# You have no idea which path ran.
+assert resp.status_code in (200, 429, 502)
+
+# RIGHT — verifies the behavior the test claims to test
+assert resp.status_code == 200
+data = resp.json()
+assert "signals" in data
+assert len(data["signals"]) > 0
+signal = data["signals"][0]
+assert "asset" in signal
+assert "action" in signal
+```
+
+`assert status in (200, 502)` is a fallback chain in test form — the same antipattern as `try/except` with silent degradation. If a test tolerates an error, it's not testing the happy path. If the service might be down, fix the test environment, don't weaken the assertion.
+
+### No Conditional Verification
+
+```python
+# WRONG — if status is 429, the entire data verification is skipped.
+# The test "passes" without testing anything.
+if resp.status_code == 200:
+    data = resp.json()
+    assert "signals" in data
+
+# RIGHT — the test either verifies behavior or fails
+assert resp.status_code == 200
+data = resp.json()
+assert "signals" in data
+```
+
+### No Skip as Fixture Substitute
+
+```python
+# WRONG — test always skips because no seed data exists.
+# It will never exercise the behavior.
+wizards = resp.json()["wizards"]
+if not wizards:
+    pytest.skip("No wizards in registry")
+
+# RIGHT — test has a fixture that creates the data it needs
+@pytest.fixture
+def wizard_profile(registry_client):
+    """Seed a WizardProfile record for testing."""
+    record_id = registry_client.write_record(...)
+    yield record_id
+    registry_client.delete_record(record_id)
+```
+
+### Integration First
+
+Default to integration tests with real infrastructure. Only mock at system boundaries (external APIs, SSH, process management). Everything else — git, file I/O, database queries, HTTP endpoints — runs for real.
+
+If you must mock, mock at the interface your code calls, not three layers down. Use `spec=` on every MagicMock. Prefer `monkeypatch` over `@patch`.
+
 ## Testing Anti-Patterns
 
 When adding mocks or test utilities, read @testing-anti-patterns.md to avoid common pitfalls:
