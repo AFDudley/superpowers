@@ -1,19 +1,19 @@
 {
-  "name": "superpowers-dev",
-  "description": "Development marketplace for Superpowers core skills library",
+  "name": "afdudley-superpowers",
+  "description": "Superpowers fork with testing methodology (observable assertions, spec-driven tests)",
   "owner": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com"
+    "name": "A. F. Dudley",
+    "email": "a.frederick.dudley@gmail.com"
   },
   "plugins": [
     {
       "name": "superpowers",
-      "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques",
-      "version": "5.0.2",
+      "description": "Core skills library with testing methodology: TDD, debugging, collaboration patterns, observable assertions",
+      "version": "5.0.3",
       "source": "./",
       "author": {
-        "name": "Jesse Vincent",
-        "email": "jesse@fsck.com"
+        "name": "A. F. Dudley",
+        "email": "a.frederick.dudley@gmail.com"
       }
     }
   ]
