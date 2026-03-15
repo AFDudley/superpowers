@@ -10,7 +10,10 @@
       "name": "superpowers",
       "description": "Core skills library with testing methodology: TDD, debugging, collaboration patterns, observable assertions",
       "version": "5.0.3",
-      "source": "./",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/AFDudley/superpowers.git"
+      },
       "author": {
         "name": "A. F. Dudley",
         "email": "a.frederick.dudley@gmail.com"
