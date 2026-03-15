@@ -7,7 +7,7 @@
   },
   "plugins": [
     {
-      "name": "superpowers",
+      "name": "superpowers-exophial",
       "description": "Core skills library with testing methodology: TDD, debugging, collaboration patterns, observable assertions",
       "version": "5.0.3",
       "source": {
